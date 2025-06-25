@@ -49,18 +49,25 @@ class WalkingMechanism:
     
     def elliptical_path(self):
         
-        swing_path = np.linspace(0, np.pi,self.swing_steps)
-        stance_path = np.linspace(np.pi, 2 * np.pi, self.stance_steps)
-        theta = np.concatenate([swing_path, stance_path])
+        swing_theta = np.linspace(np.pi, 0, self.swing_steps)
+        swing_x = self.x1 + (self.step_lengthX / 2) * np.cos(swing_theta)
+        swing_y = self.y1 + self.step_lengthY * np.sin(swing_theta)
 
-        x = self.x1 + self.step_lengthX/2 + self.step_lengthX * np.cos(theta)
-        y = self.y1 + self.step_lengthY/2 + self.step_lengthY * np.sin(theta)
+        stance_x = np.linspace(self.x1 + self.step_lengthX / 2,self.x1 - self.step_lengthX / 2, self.stance_steps)
+        stance_y = np.full(self.stance_steps, self.y1)
+
+        x = np.concatenate([swing_x, stance_x])
+        y = np.concatenate([swing_y, stance_y])
+
+        print(x)
 
         return x, y
+    
 
     def ik(self, x, y):
         b, a = inverse_kinematics(x, y)
         return int(b.item()), int(a.item())
+
 
 class LegMovement():
 
