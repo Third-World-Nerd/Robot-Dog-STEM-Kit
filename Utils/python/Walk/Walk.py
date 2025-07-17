@@ -21,7 +21,7 @@ from kinematics import inverse_kinematics
 from pid_leg_stabilizer import PIDLegStabilizer
 from serial_comm import SerialComm
 
-def pid_loop(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_roll_setpoint_lock):
+def pid_loop(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_roll_setpoint_lock, swinging_legs, swinging_legs_lock):
 
 
     try:
@@ -100,8 +100,12 @@ def pid_loop(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_rol
         ik_failed = False
 
         with foot_positions_lock:
+            with swinging_legs_lock:
+                current_swinging_legs = swinging_legs[:]
+
             for leg in range(NUM_LEGS):
-                foot_positions[leg][1] += deltas[leg]
+                if not current_swinging_legs[leg]:
+                    foot_positions[leg][1] += deltas[leg]
             foot_positions_local = copy.deepcopy(foot_positions)
 
         # Inverse Kinematics
@@ -164,6 +168,13 @@ def pid_loop(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_rol
 #                 foot_positions[leg][1] += dy
 #         time.sleep(delay)
 
+
+def set_swing_legs(swing_legs, swing_legs_lock, swing_leg_indices):
+    with swing_legs_lock:
+        for i in range(len(swing_legs)):
+            swing_legs[i] = i in swing_leg_indices
+
+
 def walk(foot_positions, legs, dx, dy, foot_lock):
     with foot_lock:
         for leg in legs:
@@ -175,6 +186,9 @@ def tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, pitch_setpoint, rol
         pitch_roll_setpoint[0] = pitch_setpoint
         pitch_roll_setpoint[1] = roll_setpoint
 
+def maw_walk(foot_positions, leg , dx, dy):
+
+
 import threading
 
 if __name__ == "__main__":
@@ -182,81 +196,96 @@ if __name__ == "__main__":
     pitch_roll_setpoint = [0.0, 0.0]
     foot_positions_lock = threading.Lock()
     pitch_roll_setpoint_lock = threading.Lock()
+    swinging_legs = [False for _ in range(NUM_LEGS)]
+    swinging_legs_lock = threading.Lock()
+
 
     # Start PID loop in a separate thread
     pid_thread = threading.Thread(
-        target=pid_loop, args=(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_roll_setpoint_lock)
+        target=pid_loop, args=(foot_positions, foot_positions_lock, pitch_roll_setpoint, pitch_roll_setpoint_lock, swinging_legs, swinging_legs_lock)
     )
     pid_thread.daemon = True  # Thread exits when main thread exits
     pid_thread.start()
 
-    time.sleep(10)  # Optional: Let the PID loop stabilize first
 
-    tilt_angle = 7
+
+    tilt_angle = 5
     delay = 3
     walk_delay = 1
 
+    time.sleep(5)
+
+
     # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, tilt_angle, -tilt_angle)
     # time.sleep(delay)
-    # walk(foot_positions, [0], 0, STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
-    # walk(foot_positions, [0], -STEP_LENGTH_X, 0,foot_positions_lock)
-    # walk(foot_positions, [1,2,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
-    # time.sleep(walk_delay)
-    # walk(foot_positions, [0], 0, -STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [0])  # If leg 0 is swinging
+    walk(foot_positions, [0], 0, STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [0], -STEP_LENGTH_X, 0,foot_positions_lock)
+    walk(foot_positions, [1,2,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [0], 0, -STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
     # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
-    # time.sleep(delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [])
+    time.sleep(delay)
 
-    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, tilt_angle, tilt_angle)
+    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle, +tilt_angle)
     # time.sleep(delay)
-    # walk(foot_positions, [1], 0, STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
-    # walk(foot_positions, [1], -STEP_LENGTH_X, 0,foot_positions_lock)
-    # walk(foot_positions, [0,2,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
-    # time.sleep(walk_delay)
-    # walk(foot_positions, [1], 0, -STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [3])  # If leg 3 is swinging
+    walk(foot_positions, [3], 0, STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [3], -STEP_LENGTH_X, 0,foot_positions_lock)
+    walk(foot_positions, [0,1,2], STEP_LENGTH_X/4, 0,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [3], 0, -STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
     # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
-    # time.sleep(delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [])
+    time.sleep(delay)
 
-    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle-6, tilt_angle+4)
+    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, +tilt_angle, +tilt_angle)   #HAVE TO CHECK CONFUSED  
     # time.sleep(delay)
-    # walk(foot_positions, [3], 0, STEP_LENGTH_Y,foot_positions_lock)
-    # # time.sleep(walk_delay)
-    # walk(foot_positions, [3], -STEP_LENGTH_X, 0,foot_positions_lock)
-    # walk(foot_positions, [0,1,2], STEP_LENGTH_X/4, 0,foot_positions_lock)
-    # time.sleep(walk_delay)
-    # walk(foot_positions, [3], 0, -STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [1])  # If leg 1 is swinging
+    walk(foot_positions, [1], 0, STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [1], -STEP_LENGTH_X, 0,foot_positions_lock)
+    walk(foot_positions, [0,2,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [1], 0, -STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
     # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [])
+    time.sleep(delay)
+
+
+    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle, -tilt_angle)
+    # time.sleep(delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [2])  # If leg 2 is swinging
+    walk(foot_positions, [2], 0, STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [2], -STEP_LENGTH_X, 0,foot_positions_lock)
+    walk(foot_positions, [0,1,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
+    time.sleep(walk_delay)
+    walk(foot_positions, [2], 0, -STEP_LENGTH_Y,foot_positions_lock)
+    time.sleep(walk_delay)self
+    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [])
     # time.sleep(delay)
 
 
-    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle-6, -tilt_angle-4)
+    # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle, -tilt_angle)
     # time.sleep(delay)
+    # set_swing_legs(swinging_legs, swinging_legs_lock, [2])  # If leg 0 is swinging
     # walk(foot_positions, [2], 0, STEP_LENGTH_Y,foot_positions_lock)
     # # time.sleep(walk_delay)
-    # walk(foot_positions, [2], -STEP_LENGTH_X, 0,foot_positions_lock)
-    # walk(foot_positions, [0,1,3], STEP_LENGTH_X/4, 0,foot_positions_lock)
+    # walk(foot_positions, [2], STEP_LENGTH_X, 0,foot_positions_lock)
+    # walk(foot_positions, [0,1,3], -STEP_LENGTH_X/4, 0,foot_positions_lock)
     # time.sleep(walk_delay)
     # walk(foot_positions, [2], 0, -STEP_LENGTH_Y,foot_positions_lock)
     # time.sleep(walk_delay)
     # tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
     # time.sleep(delay)
-
-
-    tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, -tilt_angle, -tilt_angle)
-    time.sleep(delay)
-    walk(foot_positions, [2], 0, STEP_LENGTH_Y,foot_positions_lock)
-    # time.sleep(walk_delay)
-    walk(foot_positions, [2], STEP_LENGTH_X, 0,foot_positions_lock)
-    walk(foot_positions, [0,1,3], -STEP_LENGTH_X/4, 0,foot_positions_lock)
-    time.sleep(walk_delay)
-    walk(foot_positions, [2], 0, -STEP_LENGTH_Y,foot_positions_lock)
-    time.sleep(walk_delay)
-    tilt_body(pitch_roll_setpoint, pitch_roll_setpoint_lock, 0, 0)
-    time.sleep(delay)
 
     time.sleep(10)
 
