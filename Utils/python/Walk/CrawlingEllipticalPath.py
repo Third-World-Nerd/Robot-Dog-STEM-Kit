@@ -44,13 +44,13 @@ class WalkingMechanism:
         self.arm1 = arm1
         self.arm2 = arm2
         self.x1, self.y1 = start[0], start[1]
-        self.step_lengthX = step_lengthX * 2
-        self.step_lengthY = step_lengthY * 2
+        self.step_lengthX = step_lengthX 
+        self.step_lengthY = step_lengthY 
         self.swing_steps = inter_stepsX
         self.stance_steps = inter_stepsY
         self.gait_cycle_len = self.swing_steps + self.stance_steps
         self.offset = offset
-        self.trajectory = self.bezier_path()
+        self.trajectory = self.elliptical_path()
 
 
 
@@ -110,53 +110,53 @@ class WalkingMechanism:
 
         
 
-    # def elliptical_path(self):
+    def elliptical_path(self):
         
 
 
-    #     """
-    #     This is for elliptical swing and linear stance
-    #     """
-    #     # swing_theta = np.linspace(np.pi, 0, self.swing_steps)
-    #     # swing_x = self.x1 + (self.step_lengthX / 2) * np.cos(swing_theta)
-    #     # swing_y = self.y1 + self.step_lengthY * np.sin(swing_theta)
+        """
+        This is for elliptical swing and linear stance
+        """
+        # swing_theta = np.linspace(np.pi, 0, self.swing_steps)
+        # swing_x = self.x1 + (self.step_lengthX / 2) * np.cos(swing_theta)
+        # swing_y = self.y1 + self.step_lengthY * np.sin(swing_theta)
 
 
-    #     # stance_x = np.linspace(self.x1 + self.step_lengthX / 2,self.x1 - self.step_lengthX / 2, self.stance_steps)
-    #     # stance_y = np.full(self.stance_steps, self.y1)
+        # stance_x = np.linspace(self.x1 + self.step_lengthX / 2,self.x1 - self.step_lengthX / 2, self.stance_steps)
+        # stance_y = np.full(self.stance_steps, self.y1)
 
-    #     # x = np.concatenate([swing_x, stance_x])
-    #     # y = np.concatenate([swing_y, stance_y])
+        # x = np.concatenate([swing_x, stance_x])
+        # y = np.concatenate([swing_y, stance_y])
 
-    #     # # print(x)
+        # # print(x)
 
-    #     # return x, y
+        # return x, y
 
 
     #     """
     #     This is for elliptical swing and stance
     #     """
 
-    #     a = self.step_lengthX / 2  
-    #     b = self.step_lengthY      
+        a = self.step_lengthX / 2  
+        b = self.step_lengthY      
 
-    #     swing_theta = np.linspace(np.pi, 0, self.swing_steps)
+        swing_theta = np.linspace(np.pi, 0, self.swing_steps)
 
-    #     # print(swing_theta)
-    #     # print(self.x1)
-    #     swing_x = self.x1 + a * np.cos(swing_theta)
-    #     swing_y = self.y1 + b * np.sin(swing_theta)
+        # print(swing_theta)
+        # print(self.x1)
+        swing_x = self.x1 + a * np.cos(swing_theta)
+        swing_y = self.y1 + b * np.sin(swing_theta)
 
-    #     # print(swing_x)
+        # print(swing_x)
 
-    #     stance_theta = np.linspace(0, -np.pi, self.stance_steps)
-    #     stance_x = self.x1 + a * np.cos(stance_theta)
-    #     stance_y = self.y1 + b * np.sin(stance_theta)
+        stance_theta = np.linspace(0, -np.pi, self.stance_steps)
+        stance_x = self.x1 + a * np.cos(stance_theta)
+        stance_y = self.y1 + b * np.sin(stance_theta)
 
-    #     x = np.concatenate([swing_x, stance_x])
-    #     y = np.concatenate([swing_y, stance_y])
+        x = np.concatenate([swing_x, stance_x])
+        y = np.concatenate([swing_y, stance_y])
 
-    #     return x, y
+        return x, y
     
 
     def ik(self, x, y, pX = 0, pY = 0):
@@ -215,6 +215,7 @@ class LegMovement():
 
             for i in range(4):
                 x, y = leg_positions[i]
+                print(x, y)
                 a, b = self.legs[i].ik(x, y)
                 command[i] = [f"{int(b)}", f"{int(a)}", "0"]
 
@@ -265,7 +266,7 @@ class LegMovement():
 
         self.generate_angles()
 
-        time.sleep(100)
+        time.sleep(3)
 
         
         steps = 0
@@ -277,6 +278,7 @@ class LegMovement():
             command = [None] * 4
 
             command = self.angles[steps%self.steps]
+            print(time.time() - calcStart)
 
             # current_leg = steps
             # leg_trajectories = [leg.trajectory for leg in self.legs]
@@ -301,7 +303,10 @@ class LegMovement():
 
             if ser and ser.is_open:
                 try:
-                    ser.write_line(command.encode())
+                    command = command.encode()
+                    print(time.time() - calcStart)
+                    ser.write_line(command)
+                    print(time.time() - calcStart)
                     now = datetime.now()
                     minute = now.strftime("%M")
                     second = now.strftime("%S")
@@ -312,10 +317,12 @@ class LegMovement():
             else:
 
                 print(f"Error: Serial port {SERIAL_PORT_SEND} not available")
-            time.sleep(delay)
+            time.sleep(0.02)
             print(f"Time taken : {time.time() - calcStart}")
             # time.sleep(0.01)
             steps += 1
+            # if steps % 12 == 0:
+            #     time.sleep(0.005)
 
 wm = [WalkingMechanism(HIP_KNEE_LENGTH, KNEE_FOOT_LENGTH, FOOT_POSITIONS_WALK[0], STEP_LENGTH_X, STEP_LENGTH_Y, 0, INTERPOLATION_STEPS_X, INTERPOLATION_STEPS_Y),
       WalkingMechanism(HIP_KNEE_LENGTH, KNEE_FOOT_LENGTH, FOOT_POSITIONS_WALK[1], STEP_LENGTH_X, STEP_LENGTH_Y, 1, INTERPOLATION_STEPS_X, INTERPOLATION_STEPS_Y),   #2
