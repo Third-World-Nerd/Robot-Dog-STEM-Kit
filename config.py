@@ -22,8 +22,8 @@ JOINT_ANGLES_INIT = [
 HIP_KNEE_LENGTH = 95  # Hip to knee
 KNEE_FOOT_LENGTH = 100  # Knee to foot
 
-INTERPOLATION_STEPS_X = 12
-INTERPOLATION_STEPS_Y = 12
+INTERPOLATION_STEPS_X = 30
+INTERPOLATION_STEPS_Y = 30
 
 
 a = 20
@@ -34,10 +34,10 @@ d = -175
 
 FOOT_POSITIONS_REST = [[-95, -195], [-95, -195], [95, -195], [95, -195]]    
 # FOOT_POSITIONS_WALK = [[a, c-10], [a, d-10], [b, c-10], [b, d-10]]
-FOOT_POSITIONS_WALK = [[0, -162], [0, -160], [0, -162], [0, -160]]
-# FOOT_POSITIONS_WALK = [[95, -100]] * 4
-STEP_LENGTH_X = -40  # Step length in X direction
-STEP_LENGTH_Y = 20 # Step length in Y direction
+FOOT_POSITIONS_WALK = [[0, -150], [0, -150], [0, -165], [0, -160]]
+# FOOT_POSITIONS_WALK = [[0, -100]] * 4
+STEP_LENGTH_X = 0  # Step length in X direction
+STEP_LENGTH_Y = 30 # Step length in Y direction
 
 DELAY = 0.03
 

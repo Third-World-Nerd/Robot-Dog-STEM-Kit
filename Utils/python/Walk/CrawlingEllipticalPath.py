@@ -193,8 +193,10 @@ class LegMovement():
         self.legs = legs
         self.foot_positions = fp
         self.steps = steps * 2
-        self.angles = self.generate_angles()
-
+        self.generate_angles()
+        # self.txt = ""
+        # print(type(self.angles))
+        # exit()
 
     def generate_angles(self):
         self.angles = []
@@ -223,6 +225,11 @@ class LegMovement():
             command_flat = [angle for leg_angles in command for angle in leg_angles]
             command = f"<{','.join(command_flat)}>"
             self.angles.append(command)
+        
+        # print(type(self.angles))
+        # self.txt = f"{self.angles}"
+        # with open("angles.txt", 'w') as f:
+        #     f.write(self.txt)
         # print(self.angles)
 
         # print(command_flat)
@@ -266,7 +273,7 @@ class LegMovement():
 
         self.generate_angles()
 
-        time.sleep(3)
+        time.sleep(4)
 
         
         steps = 0
@@ -317,12 +324,12 @@ class LegMovement():
             else:
 
                 print(f"Error: Serial port {SERIAL_PORT_SEND} not available")
-            time.sleep(0.02)
+            time.sleep(0.01)
             print(f"Time taken : {time.time() - calcStart}")
             # time.sleep(0.01)
             steps += 1
-            # if steps % 12 == 0:
-            #     time.sleep(0.005)
+            # if steps % 24 == 0:
+            #     exit()
 
 wm = [WalkingMechanism(HIP_KNEE_LENGTH, KNEE_FOOT_LENGTH, FOOT_POSITIONS_WALK[0], STEP_LENGTH_X, STEP_LENGTH_Y, 0, INTERPOLATION_STEPS_X, INTERPOLATION_STEPS_Y),
       WalkingMechanism(HIP_KNEE_LENGTH, KNEE_FOOT_LENGTH, FOOT_POSITIONS_WALK[1], STEP_LENGTH_X, STEP_LENGTH_Y, 1, INTERPOLATION_STEPS_X, INTERPOLATION_STEPS_Y),   #2
