@@ -28,6 +28,7 @@ void moveLeg(int leg, int joint, int angle) {
       angleMin = KNEE_JOINT_ANGLE_MIN;
       angleMax = KNEE_JOINT_ANGLE_MAX;
       phase=-180;
+
       break;
 
     case HIP_LEG_JOINT:
@@ -47,23 +48,33 @@ void moveLeg(int leg, int joint, int angle) {
   }
 
   // Constrain and map
+
   angle = constrain(angle, angleMin, angleMax);
   int pulse = map(abs(angle+phase), 0, 180, PULSE_MIN, PULSE_MAX);
-
   if (leg == LEG_2 || leg == LEG_4) {
     pulse = PULSE_MIN + PULSE_MAX - pulse;   // Invert within range
   }
 
-  if(leg==LEG_4 && joint==KNEE_JOINT){
+  if(leg==LEG_3 && joint==HIP_LEG_JOINT){
     pulse=map(pulse,PULSE_MIN,PULSE_MAX,PULSE_MIN_210,PULSE_MAX_210);
   }
 
-    if(leg==LEG_2 && joint==KNEE_JOINT){
-    pulse=map(pulse,PULSE_MIN,PULSE_MAX,PULSE_MIN_320,PULSE_MAX_320);
-  }
 
   int channel=((leg) * 3) + joint;
+
   pulse=pulse+pulse_offset[channel];
+  // if(channel==2 && pulse<PULSE_MIN_2){
+  //   pulse=PULSE_MIN_2;
+  // }
+  //   if(channel==5 && pulse>PULSE_MAX_5){
+  //   pulse=PULSE_MAX_5;
+  // }
+  //   if(channel==8 && pulse<PULSE_MIN_8){
+  //   pulse=PULSE_MIN_8;
+  // }
+  //   if(channel==11 && pulse>PULSE_MAX_11){
+  //   pulse=PULSE_MAX_11;
+  // }
   servoBoard.setPWM(channel, 0 ,pulse);
-  // return pulse;
+
 }
