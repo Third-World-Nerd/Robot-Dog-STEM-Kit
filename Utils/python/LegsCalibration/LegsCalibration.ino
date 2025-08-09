@@ -4,9 +4,8 @@
 #define NUM_JOINTS 3
 
 void setup() {
-  Serial.begin(2000000);
-  while (!Serial); // Wait for serial on Leonardo-type boards
-  Serial.println("Ready to receive joint angles...");
+  Serial.begin(115200);
+  while (!Serial); // Wait efor serial on Leonardooo-type boards
   initializeLeg();  // Setup servos
 
 }
@@ -51,6 +50,7 @@ void loop() {
           moveLeg(leg, KNEE_JOINT, angles[leg][KNEE_JOINT]);
           moveLeg(leg, HIP_LEG_JOINT, angles[leg][HIP_LEG_JOINT]);
           moveLeg(leg, HIP_BODY_JOINT, angles[leg][HIP_BODY_JOINT]);
+          
         }
       } else {
         Serial.println("Invalid angle data.");
