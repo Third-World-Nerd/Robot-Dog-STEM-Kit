@@ -59,6 +59,10 @@ void moveLeg(int leg, int joint, int angle) {
     pulse=map(pulse,PULSE_MIN,PULSE_MAX,PULSE_MIN_210,PULSE_MAX_210);
   }
 
+  if(leg == LEG_2 && joint == HIP_LEG_JOINT){
+    pulse = map(pulse, PULSE_MIN, PULSE_MAX, PULSE_MIN_320, PULSE_MAX_320);
+  }
+
 
   int channel=((leg) * 3) + joint;
 

@@ -32,43 +32,27 @@ def forward_kinematics(knee_joint_angle, hip_leg_joint_angle):
 
 # ==== Inverse Kinematics ====
 def inverse_kinematics(x, y):
-    # Convert display coordinates back to original coordinates
-    x_orig = x
-    y_orig = y
-
     # Distance from origin to target
-    L = np.hypot(x_orig, y_orig)
+    L = np.hypot(x, y)
 
     # Check reachability
-    if L > HIP_KNEE_LENGTH + KNEE_FOOT_LENGTH or L < abs(
-        HIP_KNEE_LENGTH - KNEE_FOOT_LENGTH
-    ):
+    if L > HIP_KNEE_LENGTH + KNEE_FOOT_LENGTH or L < abs(HIP_KNEE_LENGTH - KNEE_FOOT_LENGTH):
         return None, None
 
     # Law of cosines for knee angle (inner angle)
-    cos_knee = (HIP_KNEE_LENGTH**2 + KNEE_FOOT_LENGTH**2 - L**2) / (
-        2 * HIP_KNEE_LENGTH * KNEE_FOOT_LENGTH
-    )
+    cos_knee = (L**2 - HIP_KNEE_LENGTH**2 - KNEE_FOOT_LENGTH**2) / (2 * HIP_KNEE_LENGTH * KNEE_FOOT_LENGTH)
     cos_knee = np.clip(cos_knee, -1.0, 1.0)
-    theta_knee = np.arccos(cos_knee)
+    sin_knee = np.sqrt(1 - cos_knee**2)  # Positive root for knee angle
+    sin_knee = -sin_knee  # Negative for elbow down
 
-    # Law of cosines for angle between thigh and target line
-    cos_phi = (HIP_KNEE_LENGTH**2 + L**2 - KNEE_FOOT_LENGTH**2) / (
-        2 * HIP_KNEE_LENGTH * L
-    )
-    cos_phi = np.clip(cos_phi, -1.0, 1.0)
-    phi = np.arccos(cos_phi)
-    # Angle from knee to target point
-    angle_to_knee = np.arctan2(y_orig, x_orig) - theta_knee
+    theta_knee = np.arctan2(sin_knee, cos_knee)
 
-    # Angle from origin to target point
-    angle_to_target = np.arctan2(y_orig, x_orig)
+    k1 = HIP_KNEE_LENGTH + KNEE_FOOT_LENGTH * cos_knee
+    k2 = KNEE_FOOT_LENGTH * sin_knee
 
-    # Hip angle is angle to target minus φ
-    theta_hip = angle_to_target + phi
+    theta_hip = np.arctan2(y, x) - np.arctan2(k2, k1)
 
-    # Convert to degrees
-    theta_knee_deg = np.degrees(theta_knee)
-    theta_hip_deg = np.degrees(theta_hip)
+    theta_hip_deg = int(np.degrees(theta_hip))
+    theta_knee_deg = int(180 + np.degrees(theta_knee))
 
-    return theta_knee_deg, theta_hip_deg
+    return theta_knee_deg + theta_hip_deg, theta_hip_deg

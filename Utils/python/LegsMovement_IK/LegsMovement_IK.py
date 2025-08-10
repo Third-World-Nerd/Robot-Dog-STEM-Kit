@@ -67,9 +67,7 @@ offset_y = 0
 
 # ==== Set up Plot ====
 fig, axes = plt.subplots(2, 2, figsize=(14, 12))
-plt.subplots_adjust(
-    left=0.05, right=0.95, top=0.95, bottom=0.35, wspace=0.2, hspace=0.2
-)
+plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.35, wspace=0.2, hspace=0.2)
 
 # Storage for plot elements and sliders
 lines = [[None for _ in range(2)] for _ in range(2)]
@@ -96,9 +94,7 @@ for leg in range(NUM_LEGS):
 def update_leg(leg, knee_joint_angle, hip_leg_joint_angle):
     x0, y0 = 0, 0
 
-    x1, y1, x2, y2 = forward_kinematics(
-        knee_joint_angle, hip_leg_joint_angle, apply_offset=True
-    )
+    x1, y1, x2, y2 = forward_kinematics(knee_joint_angle, hip_leg_joint_angle, apply_offset=True)
 
     row = leg // 2
     col = leg % 2
@@ -122,15 +118,14 @@ def send_all_angles():
         try:
             theta_knee = sliders[leg][0].val  # Knee
             theta_hip = sliders[leg][1].val  # Hip-Leg
-            values.extend(
-                [str(int(theta_knee)), str(int(theta_hip)), "0"]
-            )  # Hip-Body=0
+            values.extend([str(int(theta_knee + theta_hip)), str(int(theta_hip)), "0"])  # Hip-Body=0
         except Exception as e:
             print(f"Error processing angles for Leg {leg+1}: {e}")
             values.extend(["0", "0", "0"])
 
     # Format: <val1,val2,val3,...>
     command = "<" + ",".join(values) + ">"
+    print(command)
     if ser and ser.is_open:
         try:
             ser.write(command.encode())
@@ -142,7 +137,7 @@ def send_all_angles():
         except Exception as e:
             print(f"Serial error: {e}")
     else:
-        print(f"Error: Serial port {SERIAL_PORT} not available")
+        print(f"Error: Serial port {SERIAL_PORT_SEND} not available")
 
 
 sync_states = [False for _ in range(NUM_LEGS)]  # Track which legs are synced
@@ -171,22 +166,16 @@ def inverse_kinematics(x, y):
     L = np.hypot(x_orig, y_orig)
 
     # Check reachability
-    if L > HIP_KNEE_LENGTH + KNEE_FOOT_LENGTH or L < abs(
-        HIP_KNEE_LENGTH - KNEE_FOOT_LENGTH
-    ):
+    if L > HIP_KNEE_LENGTH + KNEE_FOOT_LENGTH or L < abs(HIP_KNEE_LENGTH - KNEE_FOOT_LENGTH):
         return None, None
 
     # Law of cosines for knee angle (inner angle)
-    cos_knee = (HIP_KNEE_LENGTH**2 + KNEE_FOOT_LENGTH**2 - L**2) / (
-        2 * HIP_KNEE_LENGTH * KNEE_FOOT_LENGTH
-    )
+    cos_knee = (HIP_KNEE_LENGTH**2 + KNEE_FOOT_LENGTH**2 - L**2) / (2 * HIP_KNEE_LENGTH * KNEE_FOOT_LENGTH)
     cos_knee = np.clip(cos_knee, -1.0, 1.0)
     theta_knee = np.arccos(cos_knee)
 
     # Law of cosines for angle between thigh and target line
-    cos_phi = (HIP_KNEE_LENGTH**2 + L**2 - KNEE_FOOT_LENGTH**2) / (
-        2 * HIP_KNEE_LENGTH * L
-    )
+    cos_phi = (HIP_KNEE_LENGTH**2 + L**2 - KNEE_FOOT_LENGTH**2) / (2 * HIP_KNEE_LENGTH * L)
     cos_phi = np.clip(cos_phi, -1.0, 1.0)
     phi = np.arccos(cos_phi)
     # Angle from knee to target point
@@ -315,9 +304,7 @@ def apply_ik_and_update(leg, x, y):
 
 # ==== Reset Button Handler ====
 def reset_angles(leg):
-    _, _, x, y = forward_kinematics(
-        JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=True
-    )
+    _, _, x, y = forward_kinematics(JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=True)
 
     leg_not_synced = False
     if not sync_states[leg]:
@@ -340,9 +327,7 @@ checkbox_axes = []
 
 # You need these to store button objects to prevent them from being garbage collected
 slider_buttons_up = [[None, None] for _ in range(NUM_LEGS)]  # [ [x_up, y_up], ... ]
-slider_buttons_down = [
-    [None, None] for _ in range(NUM_LEGS)
-]  # [ [x_down, y_down], ... ]
+slider_buttons_down = [[None, None] for _ in range(NUM_LEGS)]  # [ [x_down, y_down], ... ]
 
 
 for leg in range(NUM_LEGS):
@@ -379,20 +364,14 @@ for leg in range(NUM_LEGS):
         f"Leg {leg+1} X",
         -200 - offset_x,
         200 - offset_x,
-        valinit=forward_kinematics(
-            JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=False
-        )[2]
-        - offset_x,
+        valinit=forward_kinematics(JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=False)[2] - offset_x,
     )
     sliders[leg][3] = Slider(
         ax_y,
         f"Leg {leg+1} Y",
         -400 - offset_y,
         100 - offset_y,
-        valinit=forward_kinematics(
-            JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=False
-        )[3]
-        - offset_y,
+        valinit=forward_kinematics(JOINT_ANGLES_INIT[0], JOINT_ANGLES_INIT[1], apply_offset=False)[3] - offset_y,
     )
 
     # Buttons for X

@@ -11,7 +11,7 @@
 #define HIP_LEG_JOINT    1
 #define HIP_BODY_JOINT   0
 
-const int pulse_offset[12] = {0,-13,0,0,-2,3,0,6,-24,0,17,0};
+const int pulse_offset[12] = {0,-13,0,0,-27,3,0,6,-24,0,17,0};
 
 //const int pulse_offset[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 #define NUM_LEGS 4

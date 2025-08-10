@@ -165,7 +165,7 @@ class WalkingMechanism:
         if d > (self.arm1 + self.arm2) or d < abs(self.arm1 - self.arm2):
             return None
 
-        cos_theta2 = (x**2 + y**2 - self.arm1**2 - self.arm2**2) / (
+        cos_theta2 = (x**2 + y**2 - self.arm1**2 - self.arm2**2) / (    
             2 * self.arm1 * self.arm2
         )
         # if abs(cos_theta2) > 1:

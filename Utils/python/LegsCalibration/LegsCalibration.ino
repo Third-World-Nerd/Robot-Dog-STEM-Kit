@@ -7,7 +7,6 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Wait efor serial on Leonardooo-type boards
   initializeLeg();  // Setup servos
-
 }
 
 void loop() {

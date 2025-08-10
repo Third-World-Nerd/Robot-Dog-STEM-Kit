@@ -11,14 +11,16 @@ config_dir = os.path.abspath(os.path.join(__file__, "../../../.."))
 sys.path.append(config_dir)
 
 # Import the config module
-from config import BAUD_RATE
-from config import SERIAL_PORT
+from config import BAUD_RATE_SEND
+from config import SERIAL_PORT_SEND
+
+Angles = [[90, 0, 0], [90, 30, 0], [90, 0, 0], [90, 0, 0]]
 
 try:
-    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    ser = serial.Serial(SERIAL_PORT_SEND, BAUD_RATE_SEND, timeout=1)
     time.sleep(2)
 except serial.SerialException as e:
-    print(f"Error: Could not open serial port {SERIAL_PORT}: {e}")
+    print(f"Error: Could not open serial port {SERIAL_PORT_SEND}: {e}")
     ser = None
 
 # === Initialize Tkinter Window ===
@@ -67,9 +69,7 @@ def send_all_leg_data():
         for j in range(NUM_JOINTS):
             try:
                 if sliders[leg][j] is None:
-                    status_var.set(
-                        f"Error: Slider for Leg {leg+1}, Joint {j+1} is not initialized"
-                    )
+                    status_var.set(f"Error: Slider for Leg {leg+1}, Joint {j+1} is not initialized")
                     values.append("0")
                     continue
                 angle = sliders[leg][j].get()
@@ -95,7 +95,7 @@ def send_all_leg_data():
         except serial.SerialException as e:
             status_var.set(f"Serial Error: {e}")
     else:
-        status_var.set(f"Error: Serial port {SERIAL_PORT} not available")
+        status_var.set(f"Error: Serial port {SERIAL_PORT_SEND} not available")
 
     print("Sent:", command.strip())
 
@@ -104,9 +104,7 @@ def send_all_leg_data():
 def on_slider_change(val, leg, j):
     try:
         if sliders[leg][j] is None or slider_values[leg][j] is None:
-            status_var.set(
-                f"Error: Slider or label for Leg {leg+1}, Joint {j+1} is not initialized"
-            )
+            status_var.set(f"Error: Slider or label for Leg {leg+1}, Joint {j+1} is not initialized")
             return
         val = int(float(val))
         slider_values[leg][j].config(text=f"{val}°")
@@ -122,9 +120,7 @@ def on_slider_change(val, leg, j):
 def adjust_slider(leg, j, delta):
     try:
         if sliders[leg][j] is None:
-            status_var.set(
-                f"Error: Slider for Leg {leg+1}, Joint {j+1} is not initialized"
-            )
+            status_var.set(f"Error: Slider for Leg {leg+1}, Joint {j+1} is not initialized")
             return
         current = sliders[leg][j].get()
         new_val = current + delta
@@ -144,12 +140,10 @@ def reset_all():
         for leg in range(NUM_LEGS):
             for j in range(NUM_JOINTS):
                 if sliders[leg][j] is None or slider_values[leg][j] is None:
-                    status_var.set(
-                        f"Error: Slider or label for Leg {leg+1}, Joint {j+1} is not initialized"
-                    )
+                    status_var.set(f"Error: Slider or label for Leg {leg+1}, Joint {j+1} is not initialized")
                     continue
                 min_val, max_val = JOINT_RANGES[j]
-                mid_val = (min_val + max_val) // 2
+                mid_val = Angles[leg][j]  # Use the initial angles from the Angles list
                 sliders[leg][j].set(mid_val)
                 slider_values[leg][j].config(text=f"{mid_val}°")
         status_var.set("All sliders reset to midpoint")
@@ -171,12 +165,10 @@ for leg in range(NUM_LEGS):
 
     for j in range(NUM_JOINTS):
         # Joint label
-        ttk.Label(frame, text=JOINT_NAMES[j], font=LABEL_FONT).grid(
-            row=j, column=0, padx=5, pady=5, sticky="w"
-        )
+        ttk.Label(frame, text=JOINT_NAMES[j], font=LABEL_FONT).grid(row=j, column=0, padx=5, pady=5, sticky="w")
 
         min_val, max_val = JOINT_RANGES[j]
-        mid_val = (min_val + max_val) // 2
+        mid_val = Angles[leg][j]  # Use the initial angles from the Angles list
 
         # ▲ button
         up_btn = ttk.Button(
@@ -217,13 +209,9 @@ for leg in range(NUM_LEGS):
         print(f"Initialized value label for Leg {leg+1}, Joint {j+1}")
 
         # Offset label and entry
-        ttk.Label(frame, text="Offset:", font=LABEL_FONT).grid(
-            row=j, column=5, padx=5, sticky="w"
-        )
+        ttk.Label(frame, text="Offset:", font=LABEL_FONT).grid(row=j, column=5, padx=5, sticky="w")
         offset_var = tk.StringVar(value="0")
-        offset_entry = ttk.Entry(
-            frame, textvariable=offset_var, width=6, font=LABEL_FONT
-        )
+        offset_entry = ttk.Entry(frame, textvariable=offset_var, width=6, font=LABEL_FONT)
         offset_entry.grid(row=j, column=6, padx=5)
         offset_entry.bind("<Return>", lambda event: send_all_leg_data())
         offsets[leg][j] = offset_var
@@ -233,9 +221,7 @@ for leg in range(NUM_LEGS):
         send_button.grid(row=j, column=7, padx=5)
 
 # === Global Midpoint Info ===
-midpoint_frame = ttk.LabelFrame(
-    root, text="Joint Midpoints (Common for All Legs)", padding=15
-)
+midpoint_frame = ttk.LabelFrame(root, text="Joint Midpoints (Common for All Legs)", padding=15)
 midpoint_frame.grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="ew")
 midpoint_frame.grid_columnconfigure(0, weight=1)
 midpoint_frame.grid_columnconfigure(1, weight=1)
@@ -243,7 +229,7 @@ midpoint_frame.grid_columnconfigure(2, weight=1)
 
 for j in range(NUM_JOINTS):
     min_val, max_val = JOINT_RANGES[j]
-    mid_val = (min_val + max_val) // 2
+    mid_val = Angles[0][j]  # Use the initial angles from the Angles list
     ttk.Label(
         midpoint_frame,
         text=f"{JOINT_NAMES[j]} Midpoint: {mid_val}°",
@@ -253,9 +239,7 @@ for j in range(NUM_JOINTS):
 # === Reset Button ===
 style = ttk.Style()
 style.configure("TButton", font=BUTTON_FONT)
-reset_btn = ttk.Button(
-    root, text="Reset All to Midpoint", command=reset_all, width=20, style="TButton"
-)
+reset_btn = ttk.Button(root, text="Reset All to Midpoint", command=reset_all, width=20, style="TButton")
 reset_btn.grid(row=3, column=0, columnspan=2, pady=20)
 
 
@@ -272,11 +256,7 @@ root.protocol("WM_DELETE_WINDOW", on_closing)
 for leg in range(NUM_LEGS):
     for j in range(NUM_JOINTS):
         if sliders[leg][j] is None or slider_values[leg][j] is None:
-            status_var.set(
-                f"Initialization Error: Leg {leg+1}, Joint {j+1} not properly set"
-            )
-            print(
-                f"Initialization Error: Leg {leg+1}, Joint {j+1} - Slider: {sliders[leg][j]}, Label: {slider_values[leg][j]}"
-            )
+            status_var.set(f"Initialization Error: Leg {leg+1}, Joint {j+1} not properly set")
+            print(f"Initialization Error: Leg {leg+1}, Joint {j+1} - Slider: {sliders[leg][j]}, Label: {slider_values[leg][j]}")
 
 root.mainloop()
