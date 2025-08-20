@@ -41,3 +41,17 @@ class SerialComm:
         if self.is_open():
             self.ser.close()
             print("[INFO] Serial connection closed.")
+
+    def read_imu(self):
+        """Read IMU data from the serial port."""
+        try:
+            if self.is_open():
+                self.ser.reset_input_buffer()
+                time.sleep(0.001)
+                ypr_data = self.read_line().strip()
+                if ypr_data.startswith("<") and ypr_data.endswith(">"):
+                    yaw, pitch, roll = map(float, ypr_data[1:-1].split(","))
+                return yaw, pitch, roll
+        except:
+            pass
+        return None, None, None

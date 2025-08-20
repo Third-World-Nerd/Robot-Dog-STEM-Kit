@@ -3,7 +3,7 @@
 unsigned long Time;
 
 void setup() {
-  Serial.begin(2000000);
+  Serial.begin(115200);
   imu_setup();
   ahrs_setup();
 }

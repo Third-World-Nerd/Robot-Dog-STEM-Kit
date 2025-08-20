@@ -1,10 +1,10 @@
 # config.py
 
 # Serial communication settings
-SERIAL_PORT_REC = "/dev/ttyACM0"  # or "/dev/ttyUSB0" for Linux/macOS
+SERIAL_PORT_REC = "COM19"  # or "/dev/ttyUSB0" for Linux/macOS
 SERIAL_PORT_SEND = "COM18"  # or "/dev/ttyUSB1" for Linux/macOS
 # Baud rates for receiving and sending data
-BAUD_RATE_REC = 2000000  # Baud rate for receiving MPU data from Arduino/Teensy
+BAUD_RATE_REC = 115200  # Baud rate for receiving MPU data from Arduino/Teensy
 BAUD_RATE_SEND = 115200  # Baud rate for sending Motor Angle commands to Arduino
 
 # ==== Robot Leg Parameters ====
@@ -24,9 +24,12 @@ INTERPOLATION_STEPS = 16  # even number
 
 FOOT_POSITIONS_REST = [[-95, -195], [-95, -195], [95, -195], [95, -195]]
 
-FOOT_POSITIONS_WALK = [[0, -160], [0, -155], [10, -170], [10, -170]]
+
+FOOT_POSITIONS_WALK = [[0, -165], [0, -160], [10, -173], [10, -170]]
 
 STEP_LENGTH_X = -120  # even number
-STEP_LENGTH_Y = 20  # even number
+STEP_LENGTH_Y = 10  # even number
 
 DELAY = 0.025
+
+PID_SAMPLE_FREQUENCY = 25  # Hz
