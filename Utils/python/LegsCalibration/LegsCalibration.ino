@@ -3,6 +3,10 @@
 #define NUM_LEGS 4
 #define NUM_JOINTS 3
 
+#define pee_motorPin 11
+
+int pee_motorPWM = 0;
+
 void setup() {
   Serial.begin(115200);
   while (!Serial); // Wait efor serial on Leonardooo-type boards
@@ -51,7 +55,15 @@ void loop() {
           moveLeg(leg, HIP_BODY_JOINT, angles[leg][HIP_BODY_JOINT]);
           
         }
-      } else {
+      }
+      
+      else if(index == 1)
+      {
+        pee_motorPWM = values[0];
+        analogWrite(pee_motorPin, pee_motorPWM);
+      }
+      
+      else {
         Serial.println("Invalid angle data.");
       }
     }
