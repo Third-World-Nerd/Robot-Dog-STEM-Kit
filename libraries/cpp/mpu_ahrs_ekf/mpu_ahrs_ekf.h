@@ -9,13 +9,13 @@
 #define GRAVITY 9.802 // The gravity acceleration in New York City
 
 // Calibration outcomes
-#define GYRO_X_OFFSET 0.0003547
-#define GYRO_Y_OFFSET 0.0002904
-#define GYRO_Z_OFFSET 0.0000442
+#define GYRO_X_OFFSET 0.0191751
+#define GYRO_Y_OFFSET -0.0767002
+#define GYRO_Z_OFFSET 0.0199740
 
-#define ACCEL_X_OFFSET -1.7587781
-#define ACCEL_Y_OFFSET -8.6502850
-#define ACCEL_Z_OFFSET -9.2377464
+#define ACCEL_X_OFFSET 0.0047886
+#define ACCEL_Y_OFFSET 0.4345697
+#define ACCEL_Z_OFFSET -9.9436264
 
 const float magn_ellipsoid_center[3] = {-16.444, 123.131, -60.0703};
 const float magn_ellipsoid_transform[3][3] = {{0.887227, 0.0186386, 0.0175599}, {0.0186386, 0.878481, 0.0445495}, {0.0175599, 0.0445495, 0.978254}};

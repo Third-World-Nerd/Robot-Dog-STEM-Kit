@@ -80,6 +80,9 @@ class Walk:
     def set_step_lengthX(self, leftX, rightX):
         self.halfStepLengthsX = [leftX / 2, rightX / 2, leftX / 2, rightX / 2]
 
+    def set_step_lengthY(self, leftY, rightY):
+        self.halfStepLengthsY = [leftY / 2, rightY / 2, leftY / 2, rightY / 2]
+
     def walk(self, leg_deltas=[[0, 0], [0, 0], [0, 0], [0, 0]], duration=10):
         start_time = time.perf_counter()
         while (time.perf_counter() - start_time) < duration:

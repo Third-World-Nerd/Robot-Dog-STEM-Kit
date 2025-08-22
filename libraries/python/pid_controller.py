@@ -8,21 +8,21 @@ class PIDController:
     def __init__(self, ser_read_imu: SerialComm):
         self._ser_read_imu = ser_read_imu
 
-        self.__kp_yaw = 0.1
-        self.__ki_yaw = 0.01
-        self.__kd_yaw = 0.01
+        self._kp_yaw = 0.0
+        self._ki_yaw = 0.0
+        self._kd_yaw = 0.0
 
-        self.__kp_pitch = 0.4
-        self.__ki_pitch = 0.04
-        self.__kd_pitch = 0.04
+        self._kp_pitch = 0.4
+        self._ki_pitch = 0.04
+        self._kd_pitch = 0.04
 
-        self.__kp_roll = 0.1
-        self.__ki_roll = 0.01
-        self.__kd_roll = 0.01
+        self._kp_roll = 0.1
+        self._ki_roll = 0.01
+        self._kd_roll = 0.01
 
-        self.__dt = 1 / 25
-        self.__prev_error = 0.0
-        self.__integral = 0.0
+        self._dt = 1 / 25
+        self._prev_error = 0.0
+        self._integral = 0.0
 
         self._setpoint_yaw = 0.0
         self._setpoint_pitch = 0.0
@@ -68,7 +68,7 @@ class PIDController:
         self.kd_roll = kd
 
     def compute_leg_deltas(self):
-        yaw, pitch, roll = self._ser_read_imu()
+        yaw, pitch, roll = self._ser_read_imu.read_imu()
 
         if yaw is None or pitch is None or roll is None:
             return [[0, 0], [0, 0], [0, 0], [0, 0]]
@@ -90,9 +90,9 @@ class PIDController:
         self._pitch_error_history.append(pitch_error)
         self._roll_error_history.append(roll_error)
 
-        yaw_output = self.kp_yaw * yaw_error + self.ki_yaw * yaw_integral * self._dt + self.kd_yaw * yaw_derivative
-        pitch_output = self.kp_pitch * pitch_error + self.ki_pitch * pitch_integral * self._dt + self.kd_pitch * pitch_derivative
-        roll_output = self.kp_roll * roll_error + self.ki_roll * roll_integral * self._dt + self.kd_roll * roll_derivative
+        yaw_output = self._kp_yaw * yaw_error + self._ki_yaw * yaw_integral * self._dt + self._kd_yaw * yaw_derivative
+        pitch_output = self._kp_pitch * pitch_error + self._ki_pitch * pitch_integral * self._dt + self._kd_pitch * pitch_derivative
+        roll_output = self._kp_roll * roll_error + self._ki_roll * roll_integral * self._dt + self._kd_roll * roll_derivative
 
         delta_y_lf = -pitch_output + roll_output
         delta_y_rf = -pitch_output - roll_output
