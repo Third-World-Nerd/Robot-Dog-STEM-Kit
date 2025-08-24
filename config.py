@@ -25,7 +25,9 @@ INTERPOLATION_STEPS = 16  # even number
 FOOT_POSITIONS_REST = [[-95, -195], [-95, -195], [95, -195], [95, -195]]
 
 
-FOOT_POSITIONS_WALK = [[0, -165], [0, -160], [10, -173], [10, -170]]
+FOOT_POSITIONS_WALK = [[0, -165], [0, -170], [10, -170], [10, -165]]
+
+FOOT_POSITIONS_PEE = [[0, -120], [0, -190], [10, -150], [100, -70]]
 
 STEP_LENGTH_X = -120  # even number
 STEP_LENGTH_Y = 10  # even number

@@ -12,17 +12,15 @@ class PIDController:
         self._ki_yaw = 0.0
         self._kd_yaw = 0.0
 
-        self._kp_pitch = 0.4
-        self._ki_pitch = 0.04
-        self._kd_pitch = 0.04
+        self._kp_pitch = 0.2  # 1.0
+        self._ki_pitch = 0.02  # 1.5
+        self._kd_pitch = 0.02  # 0.1
 
-        self._kp_roll = 0.1
-        self._ki_roll = 0.01
-        self._kd_roll = 0.01
+        self._kp_roll = 0.2  # 1.0
+        self._ki_roll = 0.02  # 1.5
+        self._kd_roll = 0.02  # 0.1
 
         self._dt = 1 / 25
-        self._prev_error = 0.0
-        self._integral = 0.0
 
         self._setpoint_yaw = 0.0
         self._setpoint_pitch = 0.0
@@ -36,6 +34,13 @@ class PIDController:
         self._yaw_error_history.append(0)
         self._pitch_error_history.append(0)
         self._roll_error_history.append(0)
+
+        self.delta_x_l = 0.0
+        self.delta_x_r = 0.0
+        self.delta_y_lf = 0.0
+        self.delta_y_rf = 0.0
+        self.delta_y_lb = 0.0
+        self.delta_y_rb = 0.0
 
     def set_dt(self, dt):
         self._dt = dt
@@ -52,23 +57,25 @@ class PIDController:
     def set_setpoint_roll(self, setpoint):
         self._setpoint_roll = setpoint
 
-    def set_gains_yaw(self, kp, ki, kd):
-        self.kp_yaw = kp
-        self.ki_yaw = ki
-        self.kd_yaw = kd
-
     def set_gains_pitch(self, kp, ki, kd):
-        self.kp_pitch = kp
-        self.ki_pitch = ki
-        self.kd_pitch = kd
+        self._kp_pitch = kp
+        self._ki_pitch = ki
+        self._kd_pitch = kd
+
+    def set_gains_yaw(self, kp, ki, kd):
+        self._kp_yaw = kp
+        self._ki_yaw = ki
+        self._kd_yaw = kd
 
     def set_gains_roll(self, kp, ki, kd):
-        self.kp_roll = kp
-        self.ki_roll = ki
-        self.kd_roll = kd
+        self._kp_roll = kp
+        self._ki_roll = ki
+        self._kd_roll = kd
 
     def compute_leg_deltas(self):
-        yaw, pitch, roll = self._ser_read_imu.read_imu()
+        yaw, roll, pitch = self._ser_read_imu.read_imu()
+
+        print(f"IMU Readings - Pitch: {pitch}, Roll: {roll}")
 
         if yaw is None or pitch is None or roll is None:
             return [[0, 0], [0, 0], [0, 0], [0, 0]]
@@ -94,13 +101,11 @@ class PIDController:
         pitch_output = self._kp_pitch * pitch_error + self._ki_pitch * pitch_integral * self._dt + self._kd_pitch * pitch_derivative
         roll_output = self._kp_roll * roll_error + self._ki_roll * roll_integral * self._dt + self._kd_roll * roll_derivative
 
-        delta_y_lf = -pitch_output + roll_output
-        delta_y_rf = -pitch_output - roll_output
-        delta_y_lb = +pitch_output + roll_output
-        delta_y_rb = +pitch_output - roll_output
+        self.delta_y_lf += pitch_output + roll_output
+        self.delta_y_rf += pitch_output - roll_output
+        self.delta_y_lb += -pitch_output + roll_output
+        self.delta_y_rb += -pitch_output - roll_output
+        self.delta_x_l += -yaw_output
+        self.delta_x_r += yaw_output
 
-        delta_x_l = -yaw_output
-        delta_x_r = yaw_output
-
-        return [[delta_x_l, delta_y_lf], [delta_x_r, delta_y_rf], [delta_x_l, delta_y_lb], [delta_x_r, delta_y_rb]]
-        return [[delta_x_l, delta_y_lf], [delta_x_r, delta_y_rf], [delta_x_l, delta_y_lb], [delta_x_r, delta_y_rb]]
+        return [[self.delta_x_l, self.delta_y_lf], [self.delta_x_r, self.delta_y_rf], [self.delta_x_l, self.delta_y_lb], [self.delta_x_r, self.delta_y_rb]]

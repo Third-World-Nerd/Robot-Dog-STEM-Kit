@@ -45,17 +45,17 @@ def main():
 
     threading.Thread(target=pid_loop, args=(pid, leg_deltas, leg_deltas_lock), daemon=True).start()
 
-    walk_instance.reset()
-    time.sleep(2)
+    walk_instance.reset_dynamic(leg_deltas, duration=5, update_foot_position_walk=True)
 
-    walk_instance.set_step_lengthX(0.0, 0.0)  # forward
-    walk_instance.set_step_lengthY(0.0, 0.0)  # forward
-    walk_instance.walk(leg_deltas=leg_deltas, duration=30)
     walk_instance.reset()
+    # time.sleep(5)
 
-    # time.sleep(2)
-    # walk_instance.set_step_lengthX(120, 120)  # backward
-    # walk_instance.walk(leg_deltas, 3)
+    # walk_instance.set_step_lengthX(-120.0, -120.0)  # forward
+    # walk_instance.set_step_lengthY(20)  # forward
+    # walk_instance.walk(duration=20)
+
+    pee(motorPWM=150, duration=3, ser_write_command=ser_write_command)
+
     # walk_instance.reset()
 
 
