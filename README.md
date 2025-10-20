@@ -1,5 +1,7 @@
 # Robot-Dog
 
+https://github.com/user-attachments/assets/f82f04b2-c392-450a-b499-d7d90e3e596e
+
 #### Run cmd prompt as administrator and run:
 ```
 mklink /D "C:\Users\sakar\OneDrive\Documents\Arduino\libraries\LegControl" "E:\THIRD WORLD NERD\robotDog\libraries\cpp\LegControl"
