@@ -1,0 +1,209 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Controller</title>
+    <style>
+        button {
+            width: 100px;
+            height: 50px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        button:active {
+            background-color: #007bff;
+            color: white;
+        }
+        #status {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .button-grid {
+            display: inline-block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>Control Panel</h2>
+    
+    <div id="status">Ready to control robot</div>
+    
+    <div class="button-grid">
+        <button onclick="sendCommand('forward')">Forward</button>
+        <br>
+        <button onclick="sendCommand('left')">Left</button>
+        <button onclick="sendCommand('stop')">Stop</button>
+        <button onclick="sendCommand('right')">Right</button>
+        <br>
+        <button onclick="sendCommand('backward')">Backward</button>
+        <br>
+        <button onclick="sendCommand('custom1')">Custom 1</button>
+        <button onclick="sendCommand('custom2')">Custom 2</button>
+    </div>
+
+    <script>
+        function sendCommand(direction) {
+            // Update status immediately
+            document.getElementById('status').textContent = `Sending command: ${direction}...`;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('direction', direction);
+            
+            // Send AJAX request
+            fetch('/move', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('status').textContent = data;
+            })
+            .catch(error => {
+                document.getElementById('status').textContent = `Error: ${error}`;
+            });
+        }
+    </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Robot Controller with Camera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .camera-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .camera-stream {
+            border: 2px solid #333;
+            border-radius: 5px;
+            max-width: 100%;
+            height: auto;
+        }
+        .controls-section {
+            text-align: center;
+        }
+        button {
+            width: 100px;
+            height: 50px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        button:hover {
+            background-color: #e9ecef;
+        }
+        button:active {
+            background-color: #007bff;
+            color: white;
+        }
+        .stop-btn {
+            background-color: #dc3545;
+            color: white;
+            font-weight: bold;
+        }
+        .stop-btn:hover {
+            background-color: #c82333;
+        }
+        #status {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .button-grid {
+            display: inline-block;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Quadruped Robot Controller</h1>
+        
+        <div class="camera-section">
+            <h2>📹 Live Camera Feed</h2>
+            <img src="{{ url_for('video_feed') }}" class="camera-stream" alt="Robot Camera Stream">
+        </div>
+        
+        <div class="controls-section">
+            <h2>🎮 Robot Controls</h2>
+            
+            <div id="status">Ready to control robot</div>
+            
+            <div class="button-grid">
+                <button onclick="sendCommand('forward')">Forward</button>
+                <br>
+                <button onclick="sendCommand('left')">Left</button>
+                <button onclick="sendCommand('stop')" class="stop-btn">STOP</button>
+                <button onclick="sendCommand('right')">Right</button>
+                <br>
+                <button onclick="sendCommand('backward')">Backward</button>
+                <br>
+                <button onclick="sendCommand('custom1')">Custom 1</button>
+                <button onclick="sendCommand('custom2')">Custom 2</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendCommand(direction) {
+            // Update status immediately
+            document.getElementById('status').textContent = `Sending command: ${direction}...`;
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('direction', direction);
+            
+            // Send AJAX request
+            fetch('/move', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('status').textContent = data;
+            })
+            .catch(error => {
+                document.getElementById('status').textContent = `Error: ${error}`;
+            });
+        }
+    </script>
+</body>
+</html>
