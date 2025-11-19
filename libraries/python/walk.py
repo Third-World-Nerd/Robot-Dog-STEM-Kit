@@ -5,7 +5,6 @@ import time
 import numpy as np
 from kinematics import inverse_kinematics
 from serial_comm import SerialComm
-
 # Add the parent directory to the system path
 config_dir = os.path.abspath(os.path.join(__file__, "../../.."))
 sys.path.append(config_dir)
