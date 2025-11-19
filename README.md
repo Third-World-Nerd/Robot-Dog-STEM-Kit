@@ -105,12 +105,13 @@ python setpointTuner.py
 Note: Simulation is independent of Arduino; use it for planning and visualization.
 
 ## CAD: Final Design & Screenshots
-- Find the Final Fusion 360 file at `3D design/final_dog_body_design.f3d`
 
-![Top View](3D design/images/top_view.png)
+Find the Final Fusion 360 file at `3D design/final_dog_body_design.f3d`
+
+![Top View](3D%20design/images/top_view.png)
 *Top view of the robot dog body design*
 
-![Side View](3D design/images/front_view.png)
+![Side View](3D%20design/images/front_view.png)
 *Side view of the robot dog body design*
 
 ## Firmware Protocol (Arduino)
