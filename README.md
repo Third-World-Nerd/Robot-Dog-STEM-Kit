@@ -2,6 +2,9 @@
 
 A practical, step‑by‑step quadruped robot project. It includes Fusion 360 CAD, CoppeliaSim simulation, Arduino firmware libraries, and Python tools for walking, stabilization, and tuning.
 
+# Robot-Dog
+https://github.com/user-attachments/assets/f82f04b2-c392-450a-b499-d7d90e3e596e
+
 ## Table of Contents
 - [1. Overview](#overview)
 - [2. What’s in This Repo](#whats-in-this-repo)
@@ -102,15 +105,13 @@ python setpointTuner.py
 Note: Simulation is independent of Arduino; use it for planning and visualization.
 
 ## CAD: Final Design & Screenshots
-- Final Fusion 360 file: `3D design/final_dog_body_design.f3d`
-- Export PNGs from Fusion 360 and place under `docs/images/`:
-  - `docs/images/final_dog_body_design.png` — overall view
-  - `docs/images/robot_dog_side_view.png` — side view
-  - `docs/images/robot_dog_exploded_view.png` — exploded components
-- Optional placeholders:
-  - `docs/images/walk_demo.png` — walking gait snapshot
-  - `docs/images/coppeliasim_scene.png` — simulation UI
-  - `docs/images/electronics_layout.png` — wiring overview
+- Find the Final Fusion 360 file at `3D design/final_dog_body_design.f3d`
+
+![Top View](3D design/images/top_view.png)
+*Top view of the robot dog body design*
+
+![Side View](3D design/images/front_view.png)
+*Side view of the robot dog body design*
 
 ## Firmware Protocol (Arduino)
 Your firmware should:
