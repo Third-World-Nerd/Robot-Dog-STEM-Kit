@@ -86,6 +86,9 @@ Steps:
 python pidTuner.py
 ```
 3) Use sliders/entries to adjust `Kp`, `Ki`, `Kd` for Pitch and Roll.
+
+https://github.com/user-attachments/assets/9739330c-3a76-429f-a666-bded4085f7b8
+
 4) Observe stability and gait; lower gains if oscillations occur.
 
 ## Setpoint Tuner UI
@@ -97,6 +100,8 @@ Steps:
 python setpointTuner.py
 ```
 3) Move sliders or type exact setpoints; observe posture change.
+
+https://github.com/user-attachments/assets/0250d53e-08e5-4088-9cb0-e5dd8fefd549
 
 ## Simulation in CoppeliaSim
 1) Launch CoppeliaSim.
