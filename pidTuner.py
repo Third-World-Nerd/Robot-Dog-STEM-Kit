@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import ttk
 
 import numpy as np
-
 # Add paths
 libraries_dir = os.path.abspath(os.path.join(__file__, "../libraries/python"))
 sys.path.append(libraries_dir)
@@ -123,7 +122,7 @@ def main():
     threading.Thread(target=pid_loop, args=(pid, leg_deltas, leg_deltas_lock), daemon=True).start()
 
     walk_instance.set_step_lengthX(0.0, 0.0)  # forward
-    walk_instance.set_step_lengthY(0.0, 0.0)  # forward
+    walk_instance.set_step_lengthY(0.0)  # forward
     threading.Thread(target=lambda: walk_instance.walk(leg_deltas=leg_deltas, duration=999999), daemon=True).start()
 
     walk_instance.reset()
